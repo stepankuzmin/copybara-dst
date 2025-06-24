@@ -1,4 +1,4 @@
-# Copybara Dst
+# Copybara Dst ☘
 
 [![Copybara](https://github.com/stepankuzmin/copybara-dst/actions/workflows/copybara.yml/badge.svg)](https://github.com/stepankuzmin/copybara-dst/actions/workflows/copybara.yml)
 
