@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: ${{ env.WORK_DIR }}/package-lock.json
       - run: npm ci --no-audit --no-fund
       - run: npm run tsc
       - run: npm test
