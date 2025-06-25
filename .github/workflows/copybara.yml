@@ -1,7 +1,6 @@
 name: Copybara
 
 on:
-  push:
   pull_request_target:
     types: [opened, synchronize, reopened, edited]
 
@@ -10,50 +9,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  push:
+  pr:
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' &&
-      github.repository == 'stepankuzmin/copybara-sot' &&
-      github.ref_name == github.event.repository.default_branch
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Copybara needs full history
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: copybara.jar
-          key: copybara-v20250623
-
-      - name: Download Copybara
+      - name: Trigger SoT repo workflow via repository_dispatch
         run: |
-          if [ ! -f copybara.jar ]; then
-            wget https://github.com/google/copybara/releases/download/v20250623/copybara_deploy.jar -O copybara.jar
-          fi
-
-      - name: Set up Git credentials
-        run: |
-          git config --global credential.helper store
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          echo "https://x-access-token:${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
-
-      - name: Check
-        run: java -jar copybara.jar validate project/copy.bara.sky
-
-      - name: Copybara Push
-        run: |
-          java -jar copybara.jar migrate project/copy.bara.sky push \
-            --git-credential-helper-store-file=$HOME/.git-credentials \
-            --ignore-noop \
-            --force \
-            --init-history
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            https://api.github.com/repos/stepankuzmin/copybara-sot/dispatches \
+            -d '{"event_type": "pull_request_target", "client_payload": {"number": "${{ github.event.pull_request.number }}"}}'
