@@ -3,8 +3,6 @@ name: PR notify
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited]
-    paths-ignore:
-      - '.github/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
